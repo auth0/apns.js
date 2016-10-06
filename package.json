@@ -1,0 +1,15 @@
+{
+  "name": "auth0-apns2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "http2": "^3.3.6",
+    "jsonwebtoken": "^7.1.9"
+  }
+}
