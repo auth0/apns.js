@@ -54,8 +54,13 @@ class MainViewController: UIViewController {
     }
 }
 
-class APNS {
+class APNS: NSObject, UNUserNotificationCenterDelegate {
     static let shared = APNS()
+
+    private override init() {
+        super.init()
+        UNUserNotificationCenter.current().delegate = self
+    }
 
     var token: Data? {
         didSet {
@@ -74,6 +79,11 @@ class APNS {
                 guard error == nil && granted else { return self.onRegister(nil, error) }
                 UIApplication.shared.registerForRemoteNotifications()
         }
+    }
+
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(.alert)
     }
 }
 
