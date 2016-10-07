@@ -45,6 +45,6 @@ class TokenStore {
     this.token = jwt.sign({}, key, options);
     return this.token;
   }
-};
+}
 
 module.exports = TokenStore;
