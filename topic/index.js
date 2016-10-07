@@ -1,17 +1,18 @@
 const http2 = require('http2');
+const APNSError = require('../error');
 
-class Client {
+class Topic {
 
-  constructor(topic, environment = 'production') {
-    if (topic == null) {
-      throw new Error('missing topic');
+  constructor(name, environment = 'production') {
+    if (name == null) {
+      throw new Error('missing topic name');
     }
     this._host = environment == 'development' ? 'api.development.push.apple.com' : 'api.push.apple.com';
-    this._topic = topic;
+    this._name = name;
   }
 
-  get topic() {
-    return this._topic;
+  get name() {
+    return this._name;
   }
 
   get host() {
@@ -30,10 +31,16 @@ class Client {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
-        'apns-topic': this.topic
+        'apns-topic': this.name
       }
     };
-    return this._request(options, JSON.stringify(notification));
+    return this._request(options, JSON.stringify(notification))
+      .then(response => {
+        if (response.status == 200) {
+          return {id: response.headers['apns-id']};
+        }
+        throw new APNSError(response.status, JSON.parse(response.data));
+      });
   }
 
   _request(options, body = null) {
@@ -41,7 +48,16 @@ class Client {
       const request = http2.request(options, response => {
         var data = [];
         response.on('data', chunk => data.push(chunk));
-        response.on('end', () => resolve(data.join('')));
+        response.on('end', () => {
+          let value = {
+            status: response.statusCode,
+            headers: response.headers,
+           };
+          if (data.length > 0) {
+            value['data'] = data.join('');
+          }
+          resolve(value);
+        });
       });
       if (body != null) {
         request.write(body);
@@ -52,4 +68,4 @@ class Client {
   }
 }
 
-module.exports = Client;
+module.exports = Topic;

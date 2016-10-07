@@ -1,9 +1,11 @@
 "use strict";
 
 const Token = require('./token');
-const Client = require('./client');
+const Topic = require('./topic');
+const APNSError = require('./error');
 
 module.exports = {
   Token,
-  Client
+  Topic,
+  APNSError
 };
