@@ -1,5 +1,5 @@
 {
-  "name": "auth0-apns2",
+  "name": "auth0-apns",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,16 +7,16 @@
     "test": "mocha --recursive test",
     "test:watch": "npm test -- -w --reporter dot",
     "lint": "eslint .",
-    "push": "node cli/index.js"
+    "push": "node -r dotenv/config cli/index.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^2.0.0",
     "http2": "^3.3.6",
     "jsonwebtoken": "^7.1.9"
   },
   "devDependencies": {
+    "dotenv": "^2.0.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "eslint": "^3.7.1",
