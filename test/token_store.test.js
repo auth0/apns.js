@@ -5,8 +5,14 @@ const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const TokenStore = require('../token_store');
+
+const path = `${__dirname}/key.p8`
+console.log(`Loading key from path ${path}`);
+const key = fs.readFileSync(path);
+console.log(`Loaded key:\n ${key}`);
 
 describe('TokenStore', function() {
 
@@ -21,7 +27,7 @@ describe('TokenStore', function() {
     });
 
     it('should fail with no key id', function() {
-      expect(() => new TokenStore('TEAM_ID', { path: '/tmp/key.p8'})).to.throw(Error);
+      expect(() => new TokenStore('TEAM_ID', { pem: key})).to.throw(Error);
     });
 
     it('should fail with no key path', function() {
@@ -29,11 +35,11 @@ describe('TokenStore', function() {
     });
 
     it('should fail with no team identifier', function() {
-      expect(() => new TokenStore(null, { path: '/tmp/key.p8'})).to.throw(Error);
+      expect(() => new TokenStore(null, { pem: key})).to.throw(Error);
     });
 
     it('should create a new store', function() {
-      expect(new TokenStore('TEAM_ID', { id: 'AN_ID', path: '/tmp/key.p8'})).to.not.be.null;
+      expect(new TokenStore('TEAM_ID', { id: 'AN_ID', pem: key})).to.not.be.null;
     });
   });
 
@@ -42,7 +48,7 @@ describe('TokenStore', function() {
     var store;
 
     beforeEach(function() {
-      store = new TokenStore('TEAM_ID', { id: 'AN_ID', path: `${__dirname}/key.p8`});
+      store = new TokenStore('TEAM_ID', { id: 'AN_ID', pem: key});
     });
 
     it('should return a token', function() {
@@ -57,7 +63,7 @@ describe('TokenStore', function() {
       return expect(store.get().then(claims)).to.eventually.have.property('iss', 'TEAM_ID');
     });
 
-    it('should return a token expiring in 50 minutes', function() {
+    it('should return a token expiring in 50 minutes by default', function() {
       return expect(store.get().then(claims).then(claims => claims.exp - claims.iat)).to.eventually.eq(3000); // 50 * 60
     });
 
@@ -73,8 +79,8 @@ describe('TokenStore', function() {
       return store.get(1).then(token => new Promise(resolve => setTimeout(() => resolve(expect(store.get()).to.eventually.not.equal(token)), 1100)));
     });
 
-    it('should fail when key cannot be loaded', function() {
-      const store = new TokenStore('TEAM_ID', { id: 'AN_ID', path: `${__dirname}/should-not-found-key.p8`});
+    it('should fail when key is invalid', function() {
+      const store = new TokenStore('TEAM_ID', { id: 'AN_ID', pem: 'not-a-valid-pem'});
       return expect(store.get()).to.be.rejected;
     });
   });

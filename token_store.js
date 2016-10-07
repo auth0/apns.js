@@ -1,21 +1,13 @@
 "use strict";
 
-const fs = require('fs');
 const jwt = require('jsonwebtoken');
-
-const loadKey = (path) => {
-  console.log(`Loading key from path ${path}`);
-  const key = fs.readFileSync(path);
-  console.log(`Loaded key ${key}`);
-  return key;
-};
 
 class TokenStore {
   constructor(issuer, key) {
     this.issuer = issuer;
     this.key = key || {};
     this.token = null;
-    if (this.issuer == null || this.key.path == null || this.key.id == null) {
+    if (this.issuer == null || this.key.pem == null || this.key.id == null) {
       throw new Error('Missing required parameters issuer & key');
     }
   }
@@ -41,7 +33,7 @@ class TokenStore {
   }
 
   _newToken(expiresIn) {
-    const key = loadKey(this.key.path);
+    const key = this.key.pem;
     const options = {
       issuer: this.issuer,
       algorithm: 'ES256',
@@ -51,7 +43,6 @@ class TokenStore {
       }
     };
     this.token = jwt.sign({}, key, options);
-    console.log(`Generated token ${this.token}`);
     return this.token;
   }
 };
