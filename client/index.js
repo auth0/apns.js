@@ -3,11 +3,25 @@ const http2 = require('http2');
 class Client {
 
   constructor(topic, environment = 'production') {
-    this.host = environment == 'development' ? 'api.development.push.apple.com' : 'api.push.apple.com';
-    this.topic = topic;
+    if (topic == null) {
+      throw new Error('missing topic');
+    }
+    this._host = environment == 'development' ? 'api.development.push.apple.com' : 'api.push.apple.com';
+    this._topic = topic;
+  }
+
+  get topic() {
+    return this._topic;
+  }
+
+  get host() {
+    return this._host;
   }
 
   send(notification, device, token) {
+    if (notification == null || device == null || token == null) {
+      return Promise.reject(new Error('must provide a notification, device and token'));
+    }
     const path = `/3/device/${device}`;
     const options = {
       hostname: this.host,
