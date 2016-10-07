@@ -1,7 +1,7 @@
 {
   "name": "auth0-apns",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Apple APNS API v3 client (HTTP/2) ",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive test",
@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "push": "node -r dotenv/config cli/index.js"
   },
-  "author": "",
+  "author": "Auth0",
   "license": "MIT",
   "dependencies": {
     "http2": "^3.3.6",
