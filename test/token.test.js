@@ -7,39 +7,39 @@ const expect = chai.expect;
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
-const TokenStore = require('../token_store');
+const Store = require('../token');
 
 const path = `${__dirname}/key.p8`
 console.log(`Loading key from path ${path}`);
 const key = fs.readFileSync(path);
 console.log(`Loaded key:\n ${key}`);
 
-describe('TokenStore', function() {
+describe('token', function() {
 
   describe('#constructor', function() {
 
     it('should fail with no arguments', function() {
-      expect(() => new TokenStore()).to.throw(Error);
+      expect(() => new Store()).to.throw(Error);
     });
 
     it('should fail with no key', function() {
-      expect(() => new TokenStore('TEAM_ID')).to.throw(Error);
+      expect(() => new Store('TEAM_ID')).to.throw(Error);
     });
 
     it('should fail with no key id', function() {
-      expect(() => new TokenStore('TEAM_ID', { pem: key})).to.throw(Error);
+      expect(() => new Store('TEAM_ID', { pem: key})).to.throw(Error);
     });
 
     it('should fail with no key path', function() {
-      expect(() => new TokenStore('TEAM_ID', { id: 'IOU a key id'})).to.throw(Error);
+      expect(() => new Store('TEAM_ID', { id: 'IOU a key id'})).to.throw(Error);
     });
 
     it('should fail with no team identifier', function() {
-      expect(() => new TokenStore(null, { pem: key})).to.throw(Error);
+      expect(() => new Store(null, { pem: key})).to.throw(Error);
     });
 
     it('should create a new store', function() {
-      expect(new TokenStore('TEAM_ID', { id: 'AN_ID', pem: key})).to.not.be.null;
+      expect(new Store('TEAM_ID', { id: 'AN_ID', pem: key})).to.not.be.null;
     });
   });
 
@@ -48,7 +48,7 @@ describe('TokenStore', function() {
     var store;
 
     beforeEach(function() {
-      store = new TokenStore('TEAM_ID', { id: 'AN_ID', pem: key});
+      store = new Store('TEAM_ID', { id: 'AN_ID', pem: key});
     });
 
     it('should return a token', function() {
@@ -80,7 +80,7 @@ describe('TokenStore', function() {
     });
 
     it('should fail when key is invalid', function() {
-      const store = new TokenStore('TEAM_ID', { id: 'AN_ID', pem: 'not-a-valid-pem'});
+      const store = new Store('TEAM_ID', { id: 'AN_ID', pem: 'not-a-valid-pem'});
       return expect(store.get()).to.be.rejected;
     });
   });
