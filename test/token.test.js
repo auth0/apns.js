@@ -6,6 +6,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const faker = require('faker');
 
 const Store = require('../token');
 
@@ -16,6 +17,9 @@ console.log(`Loaded key:\n ${key}`);
 
 describe('token', function() {
 
+  const teamId = faker.random.alphaNumeric();
+  const kid = faker.random.alphaNumeric();
+
   describe('#constructor', function() {
 
     it('should fail with no arguments', function() {
@@ -23,15 +27,15 @@ describe('token', function() {
     });
 
     it('should fail with no key', function() {
-      expect(() => new Store('TEAM_ID')).to.throw(Error);
+      expect(() => new Store(teamId)).to.throw(Error);
     });
 
     it('should fail with no key id', function() {
-      expect(() => new Store('TEAM_ID', { pem: key})).to.throw(Error);
+      expect(() => new Store(teamId, { pem: key})).to.throw(Error);
     });
 
     it('should fail with no key path', function() {
-      expect(() => new Store('TEAM_ID', { id: 'IOU a key id'})).to.throw(Error);
+      expect(() => new Store(teamId, { id: kid})).to.throw(Error);
     });
 
     it('should fail with no team identifier', function() {
@@ -39,7 +43,7 @@ describe('token', function() {
     });
 
     it('should create a new store', function() {
-      expect(new Store('TEAM_ID', { id: 'AN_ID', pem: key})).to.not.be.null;
+      expect(new Store(teamId, { id: kid, pem: key})).to.not.be.null;
     });
   });
 
@@ -48,7 +52,7 @@ describe('token', function() {
     var store;
 
     beforeEach(function() {
-      store = new Store('TEAM_ID', { id: 'AN_ID', pem: key});
+      store = new Store(teamId, { id: kid, pem: key});
     });
 
     it('should return a token', function() {
@@ -60,7 +64,7 @@ describe('token', function() {
     });
 
     it('should return a token with issuer', function() {
-      return expect(store.get().then(claims)).to.eventually.have.property('iss', 'TEAM_ID');
+      return expect(store.get().then(claims)).to.eventually.have.property('iss', teamId);
     });
 
     it('should return a token expiring in 50 minutes by default', function() {
@@ -68,7 +72,7 @@ describe('token', function() {
     });
 
     it('should return a token with key id in header', function() {
-      return expect(store.get().then(header)).to.eventually.have.property('kid', 'AN_ID');
+      return expect(store.get().then(header)).to.eventually.have.property('kid', kid);
     });
 
     it('should return the same token', function() {
@@ -80,7 +84,7 @@ describe('token', function() {
     });
 
     it('should fail when key is invalid', function() {
-      const store = new Store('TEAM_ID', { id: 'AN_ID', pem: 'not-a-valid-pem'});
+      const store = new Store(teamId, { id: kid, pem: 'not-a-valid-pem'});
       return expect(store.get()).to.be.rejected;
     });
   });

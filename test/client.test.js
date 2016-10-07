@@ -4,10 +4,15 @@ const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+const faker = require('faker');
 
 const Client = require('../client');
 
 describe('client', function() {
+
+  const token = faker.random.uuid();
+  const device = faker.random.uuid();
+  const notification = {aps:{alert:faker.random.word()}};
 
   describe('#constructor', function() {
 
@@ -51,33 +56,29 @@ describe('client', function() {
       });
 
       it('should fail with only notification', function() {
-        return expect(client.send({})).to.be.rejected;
+        return expect(client.send(notification)).to.be.rejected;
       });
 
       it('should fail without token', function() {
-        return expect(client.send({}, 'device_token')).to.be.rejected;
+        return expect(client.send(notification, device)).to.be.rejected;
       });
 
       it('should fail with null notification', function() {
-        return expect(client.send(null, 'device_token', 'token')).to.be.rejected;
+        return expect(client.send(null, device, token)).to.be.rejected;
       });
 
       it('should fail with null device', function() {
-        return expect(client.send({}, null, 'token')).to.be.rejected;
+        return expect(client.send(notification, null, token)).to.be.rejected;
       });
 
       it('should fail with null token', function() {
-        return expect(client.send({}, 'device_token', null)).to.be.rejected;
+        return expect(client.send(notification, device, null)).to.be.rejected;
       });
     });
 
     describe('request', function() {
 
       var options, body;
-
-      const token = 'token';
-      const device = 'device';
-      const notification = {aps:{alert:'TEST!'}};
 
       const send = () => client.send(notification, device, token);
 
